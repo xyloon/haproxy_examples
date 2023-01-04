@@ -1,0 +1,53 @@
+version: '3.7'
+
+x-base: &base
+  logging:
+    driver: "json-file"
+    options:
+      max-file: "5"
+      max-size: "10m"
+services:
+  ha-terminator-api:
+    # this instance could be change to ssl terminator + ha 
+    #container_name: haproxy
+    image: haproxy:lts
+    #build:
+    #  context: .
+    #  dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8443:8443"
+      # stats
+      - "7999:7999"
+    volumes:
+      # haproxy
+      - type: bind
+        source: ./conf
+        target: /usr/local/etc/haproxy
+        read_only: true
+      - type: bind
+        source: ./certs
+        target: /etc/web_cert
+        read_only: true
+    networks:
+      - haproxy-net
+    depends_on:
+      - nginx
+  nginx:
+    #container_name: nginx
+    image: nginx
+    restart: unless-stopped
+    networks:
+      - haproxy-net
+  ttyd:
+    # this instance could be change to ssl terminator + ha 
+    container_name: ttyd
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks:
+      - haproxy-net
+networks:
+  haproxy-net: {}
+

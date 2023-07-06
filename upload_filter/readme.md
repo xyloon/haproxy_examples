@@ -14,11 +14,20 @@ curl http://127.0.0.1:8080/abcdefg?abc=d
 
 
 ### POST
+
+* WEB upload case 
 ```
-curl -X POST -H "User-Agent: linux bla bla" -H "Content-Type: application/json" \
--d " \
+curl -X POST -H "User-Agent: linux client" -H "Content-Type: application/json" -d " \
 { \
  \"path\":\"./directory/a.png\" }\
-" \
-http://127.0.0.1:8080/abcdefg
+" http://127.0.0.1:8080/func/folders/abcd/request-upload
+```
+
+* File browser case
+
+```
+curl -X POST -H "User-Agent: linux client" -H "Content-Type: application/json" -d " \
+{ \
+ \"path\":\"./directory/a.doc\" }\
+" http://127.0.0.1:8000/api/resources/aaaa.doc
 ```

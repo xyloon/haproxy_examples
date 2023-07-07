@@ -1,0 +1,48 @@
+version: '3.7'
+
+x-base: &base
+  logging:
+    driver: "json-file"
+    options:
+      max-file: "5"
+      max-size: "10m"
+services:
+  haproxy:
+    # docker pull haproxytech/haproxy-alpine:2.6.14 : later
+    # this instance could be change to ssl terminator + ha 
+    #container_name: haproxy
+    image: haproxy:2.6.14-alpine3.18
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+      - "8000:8000"
+      # stats
+      - "7999:7999"
+    volumes:
+      # haproxy
+      - type: bind
+        source: ./conf
+        target: /usr/local/etc/haproxy
+        read_only: true
+    networks:
+      - haproxy-net
+    depends_on:
+      - webserver
+  webserver:
+    # this instance could be change to ssl terminator + ha 
+    container_name: webrequest_receiver
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+      # haproxy
+      - type: bind
+        source: ./src
+        target: /app/src
+        read_only: true
+    networks:
+      - haproxy-net
+networks:
+  haproxy-net: {}
+

@@ -14,7 +14,7 @@ with open(argv[1], 'r') as fdr:
         for onechr in extname_base:
             if onechr >= 'a' and onechr <= 'z':
                 extstr += f'[{onechr}{onechr.upper()}]'
-            elif onechr >='a' and onechr <='Z':
+            elif onechr >='A' and onechr <='Z':
                 extstr += f'[{onechr}{onechr.lower()}]'
             elif onechr == '*':
                 extstr += '[^\\"]*'

@@ -1,0 +1,51 @@
+version: '3.7'
+
+x-base: &base
+  logging:
+    driver: "json-file"
+    options:
+      max-file: "5"
+      max-size: "10m"
+services:
+  site1:
+    image: nginx:1.25.4-alpine-slim
+    restart: unless-stopped
+    volumes:
+      # haproxy
+      - type: bind
+        source: ./site1/index.html
+        target: /usr/share/nginx/html/index.html
+        read_only: true
+      - type: bind
+        source: ./site2/index.html
+        target: /usr/share/nginx/html/another.html
+        read_only: true
+  site2:
+    image: nginx:1.25.4-alpine-slim
+    restart: unless-stopped
+    volumes:
+      # haproxy
+      - type: bind
+        source: ./site2/index.html
+        target: /usr/share/nginx/html/index.html
+        read_only: true
+      - type: bind
+        source: ./site2/index.html
+        target: /usr/share/nginx/html/another.html
+        read_only: true
+  ha-terminator-api:
+    # this instance could be change to ssl terminator + ha 
+    image: haproxy:lts
+    restart: unless-stopped
+    ports:
+      - "18080:80"
+      # stats
+      - "7999:7999"
+    volumes:
+      # haproxy
+      - type: bind
+        source: ./conf
+        target: /usr/local/etc/haproxy
+        read_only: true
+
+
